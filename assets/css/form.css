@@ -1,0 +1,830 @@
+@font-face {
+  font-family: "Atomica Jost";
+  src: url("../fonts/Jost-VariableFont_wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Atomica Oswald";
+  src: url("../fonts/Oswald-VariableFont_wght.ttf") format("truetype");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Atomica Bebas";
+  src: url("../fonts/BebasNeue-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Atomica Swanky";
+  src: url("../fonts/FontdinerSwanky-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --creme-100: #f7efd9;
+  --creme-200: #f3e8cc;
+  --creme-300: #dbc9a6;
+  --gunmetal: #1b1b1b;
+  --gunmetal-700: #3d3d3d;
+  --ciano: #63bec2;
+  --ciano-dark: #137a80;
+  --ciano-soft: #e0f2f3;
+  --amarelo: #f7c528;
+  --amarelo-soft: #fef8e4;
+  --vermelho: #b8302f;
+  --radius: 12px;
+  --texture-pulp: url("../img/pulp-texture.jpg");
+  --header-h: 96px;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --header-h: 108px;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    linear-gradient(rgba(247, 239, 217, 0.78), rgba(247, 239, 217, 0.78)),
+    var(--texture-pulp);
+  background-size: auto, 760px auto;
+  color: var(--gunmetal);
+  font-family: "Atomica Jost", sans-serif;
+  line-height: 1.5;
+}
+
+/* ── Partículas de fundo (porte de particle-field.tsx) ────────── */
+.particle-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  backdrop-filter: blur(1px) saturate(1.12);
+  -webkit-backdrop-filter: blur(1px) saturate(1.12);
+}
+
+.particle-stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.particle-vintage-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at center, rgba(27, 27, 27, 0) 60%, rgba(27, 27, 27, 0.16) 100%),
+    repeating-radial-gradient(circle at 30% 20%, rgba(27, 27, 27, 0.035) 0 1px, transparent 1px 3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .particle-stage {
+    display: none;
+  }
+}
+
+.page-content {
+  position: relative;
+  z-index: 2;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+.container {
+  width: min(100% - 32px, 900px);
+  margin-inline: auto;
+}
+
+.section {
+  padding: 40px 0;
+}
+
+.eyebrow {
+  color: var(--ciano-dark);
+  font-family: "Atomica Oswald", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+/* ── Header fixo com marca + progresso ────────────────────────── */
+.site-header-fixed {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 2px solid var(--gunmetal);
+  background:
+    linear-gradient(rgba(247, 197, 40, 0.9), rgba(247, 197, 40, 0.86)),
+    var(--texture-pulp);
+  background-size: auto, 720px auto;
+  box-shadow: 0 3px 0 rgba(27, 27, 27, 0.12);
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.brand-mark {
+  height: 34px;
+  width: 34px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.brand-wordmark {
+  color: var(--gunmetal);
+  font-family: "Atomica Swanky", "Atomica Oswald", serif;
+  font-size: clamp(1.05rem, 2.6vw, 1.5rem);
+  line-height: 1;
+}
+
+.header-wordmark {
+  text-shadow: none;
+}
+
+.header-form-title {
+  font-family: "Atomica Oswald", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--gunmetal-700);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progress-row {
+  padding-bottom: 10px;
+}
+
+@media (max-width: 640px) {
+  .header-form-title {
+    display: none;
+  }
+}
+
+/* ── Barra de progresso "Cherenkov" (porte de .metric-breakdown-*) ── */
+.metric-breakdown-bar {
+  height: 8px;
+  border: 2px solid var(--gunmetal);
+  border-radius: 999px;
+  background: var(--creme-200);
+  overflow: visible;
+  position: relative;
+}
+
+.metric-breakdown-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.30) 0%,
+      rgba(255, 255, 255, 0.07) 40%,
+      rgba(0, 0, 0, 0.06) 100%
+    ),
+    linear-gradient(
+      90deg,
+      var(--ciano-dark) 0%,
+      var(--ciano) 52%,
+      #b8ecee 100%
+    );
+  transition: width 0.82s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: cherenkov-pulse 3.2s ease-in-out infinite;
+}
+
+.metric-breakdown-fill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: repeating-linear-gradient(
+    100deg,
+    transparent              0px,
+    rgba(255, 255, 255, 0.09) 4px,
+    transparent              9px,
+    rgba(0, 0, 0, 0.04)      13px,
+    transparent              18px
+  );
+  background-size: 36px 100%;
+  animation: liquid-flow 2s linear infinite;
+}
+
+.metric-breakdown-fill::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: -1px;
+  bottom: -1px;
+  width: 22px;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(
+    90deg,
+    rgba(218, 248, 249, 0) 0%,
+    rgba(218, 248, 249, 0.55) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.metric-breakdown-fill[data-revealed="true"]::after {
+  opacity: 1;
+  transition-delay: 0.6s;
+}
+
+@keyframes cherenkov-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 3px rgba(99, 190, 194, 0.50),
+      0 0 8px rgba(99, 190, 194, 0.25),
+      0 0 16px rgba(99, 190, 194, 0.10);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow:
+      0 0 5px rgba(168, 222, 224, 0.80),
+      0 0 13px rgba(99, 190, 194, 0.60),
+      0 0 26px rgba(99, 190, 194, 0.32),
+      0 0 44px rgba(99, 190, 194, 0.14);
+    filter: brightness(1.15);
+  }
+}
+
+@keyframes liquid-flow {
+  from { background-position: 0 0; }
+  to   { background-position: 36px 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metric-breakdown-fill {
+    animation: none;
+    transition: none;
+  }
+  .metric-breakdown-fill::before {
+    animation: none;
+  }
+  .metric-breakdown-fill::after {
+    opacity: 1;
+    transition: none;
+  }
+}
+
+/* ── Cards ─────────────────────────────────────────────────── */
+.poster-card {
+  border: 3px solid var(--gunmetal);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(rgba(247, 239, 217, 0.85), rgba(247, 239, 217, 0.85)),
+    var(--texture-pulp);
+  background-size: auto, 640px auto;
+  box-shadow: 7px 7px 0 var(--amarelo);
+  padding: 24px;
+  margin-bottom: 28px;
+}
+
+.poster-card-cyan {
+  border: 3px solid var(--gunmetal);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(rgba(247, 239, 217, 0.85), rgba(247, 239, 217, 0.85)),
+    var(--texture-pulp);
+  background-size: auto, 640px auto;
+  box-shadow: 9px 9px 0 var(--ciano);
+  padding: 24px;
+  margin-bottom: 28px;
+}
+
+.poster-card-yellow {
+  border: 3px solid var(--gunmetal);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(rgba(247, 239, 217, 0.85), rgba(247, 239, 217, 0.85)),
+    var(--texture-pulp);
+  background-size: auto, 640px auto;
+  box-shadow: 7px 7px 0 var(--amarelo);
+  padding: 24px;
+  margin-bottom: 28px;
+}
+
+.poster-card legend, .poster-card-cyan legend {
+  padding: 0 8px;
+  font-family: "Atomica Oswald", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 1.05rem;
+}
+
+.block-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid var(--gunmetal);
+  background: var(--ciano);
+  font-family: "Atomica Bebas", "Atomica Oswald", sans-serif;
+  font-size: 1.15rem;
+  margin-right: 8px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.block-title {
+  display: flex;
+  align-items: center;
+  margin: 0 0 6px;
+}
+
+.block-subtitle {
+  margin: 0 0 20px;
+  font-size: 0.88rem;
+  color: var(--gunmetal-700);
+}
+
+.block-note {
+  font-size: 0.82rem;
+  color: var(--gunmetal-700);
+  font-style: italic;
+  margin: 0 0 16px;
+}
+
+/* ── Nav de steps (badges clicáveis, pulam para a tela do bloco) ── */
+.block-nav {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 0;
+  background: var(--creme-200);
+  border-bottom: 2px solid var(--gunmetal);
+}
+
+.block-nav button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--gunmetal);
+  background: var(--creme-100);
+  color: var(--gunmetal);
+  font-family: "Atomica Bebas", "Atomica Oswald", sans-serif;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.block-nav button.filled {
+  background: var(--gunmetal);
+  color: var(--creme-100);
+}
+
+.block-nav button.attention {
+  background: var(--vermelho);
+  color: var(--creme-100);
+}
+
+.block-nav button.current {
+  background: var(--ciano);
+  color: var(--gunmetal);
+  box-shadow: 2px 2px 0 var(--gunmetal);
+}
+
+/* ── Telas de step (wizard de uma tela por vez) ───────────────── */
+.step-panel[hidden] {
+  display: none;
+}
+
+@keyframes step-slide-in {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes step-slide-in-back {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.step-enter {
+  animation: step-slide-in 0.26s ease both;
+}
+
+.step-enter-back {
+  animation: step-slide-in-back 0.26s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step-enter, .step-enter-back {
+    animation: none;
+  }
+}
+
+.step-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.step-sync-status {
+  font-size: 0.76rem;
+  color: var(--gunmetal-700);
+  margin-top: 8px;
+}
+
+.step-sync-status[data-state="error"] {
+  color: #b8122b;
+  font-weight: 700;
+}
+
+/* ── Campos ────────────────────────────────────────────────── */
+.field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.field label {
+  font-family: "Atomica Oswald", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.86rem;
+}
+
+.question-label,
+.field label.question-label {
+  font-family: "Atomica Jost", sans-serif;
+  text-transform: none;
+  font-weight: 400;
+  letter-spacing: normal;
+  font-size: 18px;
+}
+
+.field-hint {
+  font-size: 0.78rem;
+  color: var(--gunmetal-700);
+  font-weight: 400;
+  text-transform: none;
+}
+
+.field-control {
+  width: 100%;
+  border: 2px solid rgba(27, 27, 27, 0.78);
+  border-radius: 4px;
+  background: var(--creme-100);
+  padding: 12px 14px;
+  color: var(--gunmetal);
+  outline: none;
+}
+
+textarea.field-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.field-control:focus {
+  box-shadow: 0 0 0 3px rgba(103, 187, 192, 0.36);
+}
+
+.field-control[aria-invalid="true"] {
+  background: #ffe5e8;
+  border-color: var(--vermelho);
+}
+
+.error-text {
+  color: #b8122b;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+}
+
+.radio-group.invalid {
+  border: 2px solid var(--vermelho);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.92rem;
+}
+
+.radio-option input {
+  width: 16px;
+  height: 16px;
+}
+
+.estimate-flag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--gunmetal-700);
+  margin-top: -6px;
+  margin-bottom: 16px;
+}
+
+.estimate-flag input {
+  width: 15px;
+  height: 15px;
+}
+
+.conditional-field {
+  margin-top: -6px;
+}
+
+.conditional-field[hidden] {
+  display: none;
+}
+
+/* ── Tabelas ───────────────────────────────────────────────── */
+.table-scroll {
+  overflow-x: auto;
+  margin-bottom: 16px;
+  border: 2px solid var(--gunmetal);
+  border-radius: 8px;
+}
+
+table.data-table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 640px;
+  background: var(--creme-100);
+}
+
+table.data-table th, table.data-table td {
+  border: 1px solid rgba(27, 27, 27, 0.3);
+  padding: 8px;
+  vertical-align: top;
+}
+
+table.data-table th {
+  background: var(--creme-200);
+  font-family: "Atomica Oswald", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.74rem;
+  text-align: left;
+}
+
+table.data-table td.row-label {
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--creme-200);
+}
+
+table.data-table input, table.data-table select, table.data-table textarea {
+  width: 100%;
+  min-width: 110px;
+  border: 1px solid rgba(27, 27, 27, 0.5);
+  border-radius: 4px;
+  background: var(--creme-100);
+  padding: 6px 8px;
+  font-size: 0.86rem;
+}
+
+table.data-table textarea {
+  min-height: 46px;
+  resize: vertical;
+}
+
+table.data-table input[aria-invalid="true"],
+table.data-table select[aria-invalid="true"],
+table.data-table textarea[aria-invalid="true"] {
+  background: #ffe5e8;
+  border-color: var(--vermelho);
+}
+
+.swot-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  min-width: 260px;
+}
+
+.swot-grid label {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.table-actions {
+  margin-bottom: 24px;
+}
+
+/* ── Botões ────────────────────────────────────────────────── */
+.atomica-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 3px solid var(--gunmetal);
+  border-radius: var(--radius);
+  padding: 10px 20px;
+  background: var(--ciano);
+  color: var(--gunmetal);
+  font-family: "Atomica Bebas", "Atomica Oswald", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 6px 6px 0 var(--gunmetal);
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.atomica-button:hover {
+  transform: translate(-2px, -2px);
+  background: #a8dee0;
+  box-shadow: 8px 8px 0 var(--gunmetal);
+}
+
+.atomica-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  box-shadow: 6px 6px 0 var(--gunmetal);
+}
+
+.atomica-button.secondary {
+  background: var(--amarelo);
+}
+
+.atomica-button.dark {
+  background: var(--gunmetal);
+  color: var(--creme-100);
+}
+
+.atomica-button.outline {
+  background: var(--creme-100);
+  box-shadow: none;
+  border-width: 2px;
+}
+
+/* ── Barra de submit ───────────────────────────────────────── */
+.submit-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  background: var(--creme-200);
+  border-top: 2px solid var(--gunmetal);
+  padding: 16px 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.autosave-status {
+  font-size: 0.78rem;
+  color: var(--gunmetal-700);
+}
+
+.submit-error {
+  color: #b8122b;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+/* ── Estado obrigado ───────────────────────────────────────── */
+#obrigado[hidden] {
+  display: none;
+}
+
+#obrigado {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#obrigado .poster-card-cyan {
+  text-align: center;
+  max-width: 560px;
+}
+
+@media (max-width: 640px) {
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .poster-card, .poster-card-cyan, .poster-card-yellow {
+    padding: 16px;
+    box-shadow: 5px 5px 0 var(--gunmetal);
+  }
+
+  .atomica-button {
+    width: 100%;
+  }
+
+  .submit-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ── Autoavaliação de maturidade: grades 0–4 e escalas ─────── */
+.check-grid { margin-bottom: 10px; }
+.scale-list { flex-direction: column; gap: 8px; }
+.scale-list .radio-option { align-items: flex-start; line-height: 1.4; }
+.scale-list .radio-option input { margin-top: 3px; flex-shrink: 0; }
+
+.scale-legend {
+  display: flex; flex-wrap: wrap; gap: 6px 14px;
+  font-size: 0.82rem; margin-bottom: 16px;
+  padding: 8px 12px; background: var(--amarelo-soft);
+  border: 1px dashed var(--gunmetal); border-radius: 8px;
+}
+
+.capability-title {
+  font-family: "Atomica Oswald", sans-serif;
+  text-transform: uppercase; font-size: 1rem; margin: 18px 0 8px;
+}
+
+table.capability-grid { min-width: 0; }
+table.capability-grid td.row-label { white-space: normal; width: 44%; }
+table.capability-grid td.row-label .field-hint { display: block; font-weight: 400; margin-top: 2px; }
+table.capability-grid th:not(:first-child) { text-align: center; width: 11%; }
+table.capability-grid th small { display: block; font-size: 0.62rem; font-weight: 400; text-transform: none; }
+table.capability-grid td.grid-cell { text-align: center; vertical-align: middle; padding: 0; }
+.grid-hit { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; cursor: pointer; }
+.grid-hit input { width: 18px; height: 18px; cursor: pointer; }
+.grid-num { display: none; }
+tr.grid-row.invalid td { background: #ffe5e8; }
+tr.grid-row.invalid { outline: 2px solid var(--vermelho); }
+.capability-grid input:disabled { cursor: not-allowed; }
+
+.filtro-box { margin-top: 24px; padding: 14px; background: var(--ciano-soft); border: 2px solid var(--gunmetal); border-radius: 8px; }
+.block-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
+
+@media (max-width: 640px) {
+  table.capability-grid thead { display: none; }
+  table.capability-grid, table.capability-grid tbody { display: block; }
+  table.capability-grid tr.grid-row { display: grid; grid-template-columns: repeat(5, 1fr); border-bottom: 1px solid rgba(27,27,27,0.3); }
+  table.capability-grid td.row-label { grid-column: 1 / -1; width: auto; border: 0; }
+  table.capability-grid td.grid-cell { border: 0; }
+  .grid-num { display: inline; font-weight: 700; font-size: 0.85rem; }
+}
+table.data-table.capability-grid .grid-hit input { min-width: 0; width: 18px; padding: 0; }
+table.data-table.capability-grid td.row-label { white-space: normal; overflow-wrap: anywhere; }
