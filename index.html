@@ -4,229 +4,96 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Autoavaliação de Maturidade em IA | Sr. Jorge</title>
-<meta name="description" content="Formulário de autoavaliação de maturidade e uso de IA, Sr. Jorge x Atomica.">
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="assets/css/form.css">
+<style>
+  .gate-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+  .gate-card{max-width:420px;width:100%}
+  .gate-card .brand-lockup{margin-bottom:16px}
+  .gate-card form{display:flex;flex-direction:column;gap:12px}
+  .gate-error{min-height:1.2em}
+</style>
 </head>
 <body>
-
-<div class="page-content">
-
-<header class="atomica-header site-header-fixed">
-  <div class="container header-row">
+<div class="gate-wrap">
+  <div class="poster-card gate-card">
     <div class="brand-lockup">
       <img src="assets/logos/logo-atomica-preta-sem-fundo.png" alt="" class="brand-mark">
       <span class="brand-wordmark header-wordmark">Atomica</span>
     </div>
-    <span class="header-form-title">Maturidade em IA: Sr. Jorge</span>
+    <p class="eyebrow">Acesso restrito</p>
+    <h2>Autoavaliação de Maturidade em IA</h2>
+    <p>Este formulário é privado. Use a mesma senha do painel do diagnóstico Sr. Jorge.</p>
+    <form id="gate-form">
+      <label for="gate-pw" class="question-label">Senha</label>
+      <input type="password" id="gate-pw" class="field-control" autocomplete="current-password" required autofocus>
+      <button type="submit" class="atomica-button" id="gate-btn">Entrar</button>
+      <span class="error-text gate-error" id="gate-error" role="alert"></span>
+    </form>
   </div>
-  <div class="container progress-row">
-    <div class="metric-breakdown-bar" id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progresso do formulário">
-      <div class="metric-breakdown-fill" id="progress-fill" style="width:0%"></div>
-    </div>
-  </div>
-</header>
+</div>
+<script>
+(function () {
+  "use strict";
+  // Mesma chave de sessionStorage para todos os formulários/painel do Sr. Jorge
+  // (mesma origem iarketinglabs.github.io): digitou uma vez, vale na aba.
+  var SESSION_KEY = "srjorge-forms-password";
+  var form = document.getElementById("gate-form");
+  var pw = document.getElementById("gate-pw");
+  var btn = document.getElementById("gate-btn");
+  var err = document.getElementById("gate-error");
 
-<nav class="block-nav" id="block-nav" aria-label="Navegação entre etapas">
-  <div class="container" style="display:flex;flex-wrap:wrap;gap:6px;">
-    <button type="button" data-step="0" title="Antes de começar">•</button>
-    <button type="button" data-step="1" data-block="1" title="Uso atual">1</button>
-    <button type="button" data-step="2" data-block="2" title="Autoavaliação">2</button>
-    <button type="button" data-step="3" data-block="3" title="Capacidades essenciais">3</button>
-    <button type="button" data-step="4" data-block="4" title="Capacidades avançadas">4</button>
-    <button type="button" data-step="5" data-block="5" title="Evidência">5</button>
-    <button type="button" data-step="6" title="Percepção e espaço aberto">✓</button>
-  </div>
-</nav>
+  function b64(s) {
+    var bin = atob(s), out = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
 
-<main class="container section" id="main-form">
+  function WrongPassword() {}
 
-  <form id="maturidade-form" novalidate>
+  function decrypt(password, p) {
+    var enc = new TextEncoder();
+    return crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"])
+      .then(function (base) {
+        return crypto.subtle.deriveKey(
+          { name: "PBKDF2", salt: b64(p.salt), iterations: p.iterations, hash: "SHA-256" },
+          base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+      })
+      .then(function (key) {
+        return crypto.subtle.decrypt({ name: "AES-GCM", iv: b64(p.iv) }, key, b64(p.data))
+          .catch(function () { throw new WrongPassword(); });
+      })
+      .then(function (buf) { return new TextDecoder().decode(buf); });
+  }
 
-    <!-- ═══════════ 0 · ANTES DE COMEÇAR ═══════════ -->
-    <div class="step-panel" data-step="0">
-      <div class="poster-card" id="intro">
-        <p class="eyebrow">Objetivo</p>
-        <p>Queremos entender, pela sua própria voz, como você usa IA hoje e onde a capacitação pode ajudar mais. <strong>Isto é escuta, não avaliação de desempenho.</strong> Não há resposta certa, e marcar "não conheço" é tão útil quanto marcar "domino".</p>
-        <p class="eyebrow">Como funciona</p>
-        <p>Tempo estimado: 12 a 15 minutos. As respostas ficam guardadas automaticamente neste navegador e, a cada etapa, no nosso banco de dados. Pode parar e voltar depois.</p>
-      </div>
+  var payloadPromise = fetch("data.enc", { cache: "no-store" }).then(function (r) {
+    if (!r.ok) throw new Error("fetch " + r.status);
+    return r.json();
+  });
 
-      <fieldset class="poster-card-cyan">
-        <legend>Antes de começar</legend>
-        <div class="field">
-          <label for="respondente-select">Quem está a responder?</label>
-          <select id="respondente-select" class="field-control" data-path="respondente.opcao">
-            <option value="">Selecione…</option>
-            <option value="Joana|Champion">Joana</option>
-            <option value="Cris|Champion">Cris</option>
-            <option value="Wesley|Champion">Wesley</option>
-            <option value="Letícia Suher|Champion">Letícia</option>
-            <option value="Tati|Stakeholder">Tati</option>
-            <option value="Camila|Stakeholder">Camila</option>
-            <option value="outro">Outra pessoa</option>
-          </select>
-        </div>
-        <div class="field conditional-field" id="respondente-outro-fields" hidden>
-          <label for="respondente-nome">Nome</label>
-          <input type="text" id="respondente-nome" class="field-control" data-path="respondente.nome_livre" data-required-if="outro">
-        </div>
-        <div class="field">
-          <label for="area">Área/papel</label>
-          <select id="area" class="field-control" data-path="respondente.area">
-            <option value="">Selecione…</option>
-            <option>Champion de Atendimento</option>
-            <option>Champion de Mídia</option>
-            <option>Champion de Design</option>
-            <option>Champion de Conteúdo</option>
-            <option>Stakeholder de Novos Negócios</option>
-            <option>Stakeholder de Recrutamento/Assistência comercial</option>
-            <option>Outro</option>
-          </select>
-        </div>
-      </fieldset>
-    </div>
+  function unlock(password, silent) {
+    btn.disabled = true; btn.textContent = "A verificar…"; err.textContent = "";
+    return payloadPromise.then(function (p) { return decrypt(password, p); }).then(function (html) {
+      try { sessionStorage.setItem(SESSION_KEY, password); } catch (e) { /* sem sessão */ }
+      document.open(); document.write(html); document.close();
+    }).catch(function (e) {
+      btn.disabled = false; btn.textContent = "Entrar";
+      if (e instanceof WrongPassword) {
+        try { sessionStorage.removeItem(SESSION_KEY); } catch (x) { /* ignora */ }
+        if (!silent) err.textContent = "Senha incorreta.";
+      } else {
+        err.textContent = "Não foi possível carregar o formulário. Verifique a ligação e tente novamente.";
+        console.error(e);
+      }
+    });
+  }
 
-    <!-- ═══════════ 1 · USO ATUAL ═══════════ -->
-    <fieldset class="poster-card step-panel" data-step="1" hidden>
-      <legend><span class="block-badge">1</span></legend>
-      <h2 class="block-title">Uso atual de IA</h2>
+  form.addEventListener("submit", function (ev) { ev.preventDefault(); if (pw.value) unlock(pw.value, false); });
 
-      <div class="field">
-        <p class="question-label">1.1 Quais ferramentas de IA você usa hoje no trabalho? <span class="field-hint">(marque todas)</span></p>
-        <div class="radio-group check-grid" data-required data-check-group="uso.ferramentas" id="ferramentas"></div>
-        <input type="text" class="field-control" placeholder="Outra(s): quais?" data-path="uso.ferramentas_outras">
-      </div>
-
-      <div class="field">
-        <label for="tarefas" class="question-label">1.2 Para quais tarefas você usa cada uma? Seja específico: "escrever briefing", "revisar arte", "organizar tarefa", não só "produtividade".</label>
-        <textarea id="tarefas" class="field-control" data-path="uso.tarefas" data-required></textarea>
-      </div>
-
-      <div class="field">
-        <p class="question-label">1.3 Com que frequência?</p>
-        <div class="radio-group" data-required>
-          <label class="radio-option"><input type="radio" name="frequencia" value="diariamente" data-path="uso.frequencia"> Diariamente</label>
-          <label class="radio-option"><input type="radio" name="frequencia" value="algumas vezes por semana" data-path="uso.frequencia"> Algumas vezes por semana</label>
-          <label class="radio-option"><input type="radio" name="frequencia" value="raramente" data-path="uso.frequencia"> Raramente</label>
-          <label class="radio-option"><input type="radio" name="frequencia" value="nunca" data-path="uso.frequencia"> Nunca</label>
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="desistiu" class="question-label">1.4 Há alguma tarefa em que você já testou IA e decidiu <strong>não continuar usando</strong>? Por quê?</label>
-        <textarea id="desistiu" class="field-control" data-path="uso.testou_e_parou" data-required placeholder="Se não houver, escreva &quot;não&quot;."></textarea>
-      </div>
-    </fieldset>
-
-    <!-- ═══════════ 2 · AUTOAVALIAÇÃO POR DIMENSÃO ═══════════ -->
-    <fieldset class="poster-card step-panel" data-step="2" hidden>
-      <legend><span class="block-badge">2</span></legend>
-      <h2 class="block-title">Autoavaliação por dimensão</h2>
-      <p class="block-note">Em cada pergunta, escolha a frase que melhor descreve a sua situação <strong>hoje</strong>.</p>
-      <div id="dimensoes"></div>
-    </fieldset>
-
-    <!-- ═══════════ 3 · CAPACIDADES A–C ═══════════ -->
-    <fieldset class="poster-card step-panel" data-step="3" hidden>
-      <legend><span class="block-badge">3</span></legend>
-      <h2 class="block-title">Mapa de capacidades de IA</h2>
-      <p class="block-note">Recursos específicos de IA. É normal não conhecer vários. Marque, para cada linha, o nível que descreve você hoje.</p>
-      <div class="scale-legend" id="scale-legend-1"></div>
-      <div id="grids-basicos"></div>
-
-      <div class="field filtro-box">
-        <p class="question-label">Você já usou IA para algo além de conversar no chat (projetos, bases de conhecimento, agentes, conectores, automações ou código)?</p>
-        <div class="radio-group" data-required>
-          <label class="radio-option"><input type="radio" name="filtro" value="Sim" data-path="capacidades.filtro_avancado"> Sim</label>
-          <label class="radio-option"><input type="radio" name="filtro" value="Não" data-path="capacidades.filtro_avancado"> Não</label>
-        </div>
-      </div>
-    </fieldset>
-
-    <!-- ═══════════ 4 · CAPACIDADES D–F (condicional) ═══════════ -->
-    <fieldset class="poster-card step-panel" data-step="4" hidden>
-      <legend><span class="block-badge">4</span></legend>
-      <h2 class="block-title">Capacidades avançadas</h2>
-      <p class="block-note">Mesma escala da etapa anterior.</p>
-      <div class="scale-legend" id="scale-legend-2"></div>
-      <div id="grids-avancados"></div>
-    </fieldset>
-
-    <!-- ═══════════ 5 · EVIDÊNCIA ═══════════ -->
-    <fieldset class="poster-card step-panel" data-step="5" hidden>
-      <legend><span class="block-badge">5</span></legend>
-      <h2 class="block-title">Um exemplo real</h2>
-      <div class="field">
-        <label for="evidencia" class="question-label">Escolha a capacidade em que você se deu a nota mais alta e conte, em 2 ou 3 linhas, algo real que fez com ela.</label>
-        <p class="field-hint" id="evidencia-hint">Serve para calibrar a autoavaliação, não para corrigir a resposta.</p>
-        <textarea id="evidencia" class="field-control" data-path="capacidades.evidencia"></textarea>
-      </div>
-    </fieldset>
-
-    <!-- ═══════════ 6 · PERCEPÇÃO E ESPAÇO ABERTO ═══════════ -->
-    <div class="step-panel" data-step="6" hidden>
-      <fieldset class="poster-card-yellow">
-        <legend>Percepção de utilidade e de risco <span class="field-hint">(opcional)</span></legend>
-        <div class="field">
-          <label for="p1">Qual tarefa do seu dia a dia você <strong>menos gosta de fazer</strong>?</label>
-          <textarea id="p1" class="field-control" data-path="percepcao.tarefa_menos_gosta"></textarea>
-        </div>
-        <div class="field">
-          <label for="p2">Dessa tarefa, alguma parte poderia ser feita com apoio de IA sem perder o que você considera essencial? Qual parte você não abriria mão de continuar fazendo você mesmo?</label>
-          <textarea id="p2" class="field-control" data-path="percepcao.parte_com_ia"></textarea>
-        </div>
-        <div class="field">
-          <label for="p3">Existe alguma tarefa em que você teria receio de usar IA, mesmo que tecnicamente desse certo? Por quê?</label>
-          <textarea id="p3" class="field-control" data-path="percepcao.receio"></textarea>
-        </div>
-        <div class="field">
-          <label for="p4">Se um colega usasse IA para "adiantar" uma etapa do seu trabalho antes de te entregar, isso ajudaria ou incomodaria? Em que condição faria diferença?</label>
-          <textarea id="p4" class="field-control" data-path="percepcao.colega_adianta"></textarea>
-        </div>
-      </fieldset>
-
-      <fieldset class="poster-card-cyan">
-        <legend>Espaço aberto: dúvidas e resistência <span class="field-hint">(opcional)</span></legend>
-        <p class="block-note">Este espaço é para escuta. Nada aqui será usado como critério de desempenho.</p>
-        <div class="field">
-          <label for="e1">O que te deixa em dúvida ou desconfortável em relação ao uso de IA na Sr. Jorge hoje?</label>
-          <textarea id="e1" class="field-control" data-path="aberto.duvidas"></textarea>
-        </div>
-        <div class="field">
-          <label for="e2">Existe algo que você gostaria de perguntar ou sugerir sobre IA e ainda não teve um canal claro para isso?</label>
-          <textarea id="e2" class="field-control" data-path="aberto.sugestoes"></textarea>
-        </div>
-        <div class="field">
-          <label for="e3">Há algo que você gostaria que a liderança soubesse antes de pedir mais adoção de IA da sua área?</label>
-          <textarea id="e3" class="field-control" data-path="aberto.para_lideranca"></textarea>
-        </div>
-      </fieldset>
-    </div>
-
-    <div class="submit-bar">
-      <button type="button" class="atomica-button outline" id="btn-back" hidden>← Voltar</button>
-      <span class="step-sync-status" id="sync-status"></span>
-      <span class="submit-error error-text" id="submit-error" hidden></span>
-      <button type="button" class="atomica-button" id="btn-next">Avançar →</button>
-    </div>
-  </form>
-</main>
-
-<section id="obrigado" hidden>
-  <div class="container">
-    <div class="poster-card-cyan">
-      <p class="eyebrow">Recebido</p>
-      <h2>Obrigado pela resposta.</h2>
-      <p>As suas respostas foram registadas. Elas vão orientar a capacitação em IA da equipa, e nunca uma avaliação de desempenho individual.</p>
-    </div>
-  </div>
-</section>
-
-</div><!-- /.page-content -->
-
-<script src="assets/js/particle-field.js"></script>
-<script src="assets/js/supabase-client.js"></script>
-<script src="assets/js/form.js"></script>
+  var saved = null;
+  try { saved = sessionStorage.getItem(SESSION_KEY); } catch (e) { /* ignora */ }
+  if (saved) unlock(saved, true);
+})();
+</script>
 </body>
 </html>
