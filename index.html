@@ -35,9 +35,8 @@
 <script>
 (function () {
   "use strict";
-  // Mesma chave de sessionStorage para todos os formulários/painel do Sr. Jorge
-  // (mesma origem iarketinglabs.github.io): digitou uma vez, vale na aba.
-  var SESSION_KEY = "srjorge-forms-password";
+  // Isolated session storage for this form; other pages may use different passwords.
+  var SESSION_KEY = "srjorge-formulario-maturidade-ia-password";
   var form = document.getElementById("gate-form");
   var pw = document.getElementById("gate-pw");
   var btn = document.getElementById("gate-btn");
